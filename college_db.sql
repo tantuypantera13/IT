@@ -1,0 +1,13 @@
+CREATE DATABASE IF NOT EXISTS college_db CHARACTER SET utf8mb4; USE college_db;
+CREATE TABLE groups (group_id INT AUTO_INCREMENT PRIMARY KEY, group_name VARCHAR(20) NOT NULL UNIQUE, specialty VARCHAR(100) NOT NULL, admission_year YEAR NOT NULL);
+CREATE TABLE teachers (teacher_id INT AUTO_INCREMENT PRIMARY KEY, last_name VARCHAR(50) NOT NULL, first_name VARCHAR(50) NOT NULL, department VARCHAR(100) NOT NULL);
+CREATE TABLE disciplines (discipline_id INT AUTO_INCREMENT PRIMARY KEY, discipline_name VARCHAR(100) NOT NULL UNIQUE, hours INT NOT NULL CHECK (hours>0));
+CREATE TABLE students (student_id INT AUTO_INCREMENT PRIMARY KEY, last_name VARCHAR(50) NOT NULL, first_name VARCHAR(50) NOT NULL, middle_name VARCHAR(50), birth_date DATE NOT NULL, group_id INT NOT NULL, FOREIGN KEY(group_id) REFERENCES groups(group_id) ON UPDATE CASCADE ON DELETE CASCADE);
+CREATE TABLE lessons (lesson_id INT AUTO_INCREMENT PRIMARY KEY, group_id INT NOT NULL, discipline_id INT NOT NULL, teacher_id INT NOT NULL, lesson_date DATE NOT NULL, lesson_type VARCHAR(30) NOT NULL, FOREIGN KEY(group_id) REFERENCES groups(group_id), FOREIGN KEY(discipline_id) REFERENCES disciplines(discipline_id), FOREIGN KEY(teacher_id) REFERENCES teachers(teacher_id));
+CREATE TABLE grades (grade_id INT AUTO_INCREMENT PRIMARY KEY, student_id INT NOT NULL, discipline_id INT NOT NULL, grade TINYINT NOT NULL CHECK(grade BETWEEN 2 AND 5), grade_date DATE NOT NULL, FOREIGN KEY(student_id) REFERENCES students(student_id) ON DELETE CASCADE, FOREIGN KEY(discipline_id) REFERENCES disciplines(discipline_id));
+INSERT INTO groups(group_name,specialty,admission_year) VALUES ('ИСП-21','Информационные системы',2021),('ПО-22','Программирование',2022);
+INSERT INTO teachers(last_name,first_name,department) VALUES ('Иванов','Иван','Информатика'),('Петрова','Анна','ПО');
+INSERT INTO disciplines(discipline_name,hours) VALUES ('Информатика',108),('Базы данных',72);
+INSERT INTO students(last_name,first_name,middle_name,birth_date,group_id) VALUES ('Сидоров','Алексей','Игоревич','2004-03-12',1),('Кузнецова','Мария','Олеговна','2005-07-21',1);
+INSERT INTO grades(student_id,discipline_id,grade,grade_date) VALUES (1,1,5,'2026-09-10'),(2,1,4,'2026-09-10');
+SELECT g.group_name,COUNT(s.student_id) FROM groups g LEFT JOIN students s ON s.group_id=g.group_id GROUP BY g.group_id;
